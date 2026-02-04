@@ -4,7 +4,7 @@ Main CLI application for personal expense analysis.
 This module provides a command-line interface for analyzing personal expenses
 with support for configuration files, logging, and customizable outputs.
 
-Author: Joseantonio Caleb Gonzales Chumbe
+Author: Joseantonio Caleb Gonzales Chumbe.
 Date: 2026
 """
 
