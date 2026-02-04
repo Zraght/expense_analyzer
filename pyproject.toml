@@ -1,0 +1,117 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "expense-analyzer"
+version = "2.0.0"
+description = "Professional Python application for personal expense analysis with automated reporting and visualization"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["expense", "analysis", "automation", "data-pipeline", "financial", "security-analysis"]
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+maintainers = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Logging",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/expense-analyzer"
+Documentation = "https://github.com/yourusername/expense-analyzer#readme"
+Repository = "https://github.com/yourusername/expense-analyzer"
+Issues = "https://github.com/yourusername/expense-analyzer/issues"
+
+[project.scripts]
+expense-analyzer = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["modules*", "utils*"]
+exclude = ["tests*", "docs*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["modules", "utils"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true

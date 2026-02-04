@@ -1,0 +1,216 @@
+# =============================================================================
+# Python Expense Analyzer - Professional .gitignore
+# =============================================================================
+# This file prevents committing build artifacts, credentials, and temporary
+# files to version control, following Python and DevOps best practices.
+# =============================================================================
+
+# ===========================
+# Python Artifacts
+# ===========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# ===========================
+# Testing Artifacts
+# ===========================
+# pytest
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ===========================
+# Environment Files
+# ===========================
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Environment variables (sensitive data)
+.env
+.env.local
+.env.*.local
+
+# ===========================
+# IDE and Editor Files
+# ===========================
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.pydevproject
+.settings/
+
+# ===========================
+# Operating System Files
+# ===========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+
+# ===========================
+# Application-Specific
+# ===========================
+# Log files (keep directory structure)
+logs/*.log
+logs/**/*.log
+
+# Output files (generated charts and reports)
+output/*.png
+output/*.pdf
+output/*.html
+output/**/*
+!output/.gitkeep
+
+# User data files (except examples)
+data/*.csv
+data/*.xlsx
+data/*.json
+!data/expenses_example.csv
+
+# Temporary analysis results
+temp/
+tmp/
+*.tmp
+
+# ===========================
+# Documentation Build
+# ===========================
+docs/_build/
+site/
+.mkdocs_cache/
+
+# ===========================
+# Jupyter Notebooks
+# ===========================
+.ipynb_checkpoints/
+*.ipynb
+
+# ===========================
+# Database Files
+# ===========================
+*.db
+*.sqlite
+*.sqlite3
+
+# ===========================
+# Secrets and Credentials
+# ===========================
+# Never commit secrets!
+secrets/
+credentials/
+*.key
+*.pem
+*.crt
+*.p12
+config/secrets.json
+config/credentials.json
+
+# ===========================
+# Backup Files
+# ===========================
+*.bak
+*.backup
+*.old
+*~
+
+# ===========================
+# Archive Files
+# ===========================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+!releases/*.zip
+
+# ===========================
+# Profiling Data
+# ===========================
+*.prof
+*.lprof
+.pymon
+
+# =============================================================================
+# End of .gitignore
+# =============================================================================
