@@ -25,7 +25,7 @@ $ expense-tracker -i data/expenses.csv
 ## Getting started
 
 ```bash
-git clone https://github.com/joseantoniocaleb/expense-tracker.git
+git clone https://github.com/Zraght/expense-tracker
 cd expense-tracker
 pip install -e .
 
