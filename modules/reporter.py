@@ -1,0 +1,285 @@
+"""
+HTML report generation.
+
+Produces a self-contained, styled HTML report from the analysis summary
+and the generated chart paths. No external CDN dependencies — all CSS is
+inlined so the file works offline.
+"""
+
+import base64
+import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+_TEMPLATE = """\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Report &mdash; {period_start} to {period_end}</title>
+  <style>
+    *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      line-height: 1.6;
+    }}
+    header {{
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: #fff;
+      padding: 2.5rem 3rem;
+    }}
+    header h1 {{ font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }}
+    header p {{ opacity: 0.7; font-size: 0.9rem; margin-top: 0.25rem; }}
+    .container {{ max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }}
+    .kpi-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }}
+    .kpi {{
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }}
+    .kpi .label {{
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6c757d;
+    }}
+    .kpi .value {{
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0f3460;
+      margin-top: 0.2rem;
+    }}
+    section {{ margin-bottom: 2.5rem; }}
+    section h2 {{
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6c757d;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }}
+    .chart-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }}
+    .chart-card {{
+      background: #fff;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }}
+    .chart-card img {{ width: 100%; height: auto; border-radius: 6px; }}
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      font-size: 0.9rem;
+    }}
+    thead {{ background: #0f3460; color: #fff; }}
+    thead th {{ padding: 0.75rem 1rem; text-align: left; font-weight: 600; }}
+    tbody tr:nth-child(even) {{ background: #f8f9fa; }}
+    tbody td {{ padding: 0.65rem 1rem; }}
+    .anomaly-card {{
+      background: #fff8e1;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.9rem;
+    }}
+    .anomaly-card .flag {{ font-weight: 700; margin-right: 0.4rem; }}
+    .anomaly-card .meta {{ color: #6c757d; font-size: 0.8rem; margin-top: 0.2rem; }}
+    .no-anomaly {{
+      color: #28a745;
+      font-weight: 600;
+      padding: 0.5rem 0;
+    }}
+    footer {{
+      text-align: center;
+      font-size: 0.8rem;
+      color: #adb5bd;
+      padding: 2rem;
+      border-top: 1px solid #e9ecef;
+      margin-top: 2rem;
+    }}
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Personal Expense Report</h1>
+    <p>Period: {period_start} &mdash; {period_end} &nbsp;|&nbsp; Generated: {generated_at}</p>
+  </header>
+
+  <div class="container">
+
+    <section>
+      <h2>Key Metrics</h2>
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="label">Total Spent</div>
+          <div class="value">${total_spent}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Transactions</div>
+          <div class="value">{num_transactions}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Monthly Average</div>
+          <div class="value">${monthly_avg}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Categories</div>
+          <div class="value">{num_categories}</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Charts</h2>
+      <div class="chart-grid">
+        {chart_cards}
+      </div>
+    </section>
+
+    <section>
+      <h2>Spending by Category</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Total</th>
+            <th>Share</th>
+            <th>Transactions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {category_rows}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Anomaly Detection</h2>
+      {anomaly_section}
+    </section>
+
+  </div>
+
+  <footer>
+    Generated by <strong>expense-tracker v1.0.0</strong> &mdash;
+    Joseantonio Caleb Gonzales Chumbe &mdash;
+    github.com/joseantoniocaleb/expense-tracker
+  </footer>
+
+</body>
+</html>
+"""
+
+
+def _encode_image(path: Path) -> str:
+    with open(path, "rb") as f:
+        data = base64.b64encode(f.read()).decode("utf-8")
+    return f"data:image/png;base64,{data}"
+
+
+def generate_html_report(
+    summary: dict[str, Any],
+    chart_paths: dict[str, Path],
+    output_dir: Path,
+    timestamp_fmt: str = "%Y%m%d_%H%M%S",
+) -> Path:
+    """
+    Render a self-contained HTML report from the analysis summary.
+
+    All chart images are embedded as base64 so the file is portable.
+
+    Args:
+        summary: Output of :func:`modules.analysis.generate_summary`.
+        chart_paths: Mapping of chart type to file path from
+            :func:`modules.visualization.generate_all_charts`.
+        output_dir: Directory where the HTML file will be saved.
+        timestamp_fmt: strftime format for the output filename.
+
+    Returns:
+        Path to the generated HTML file.
+    """
+    chart_titles = {"bar": "Spending by Category", "pie": "Distribution", "line": "Monthly Trend"}
+    chart_cards_html = ""
+    for key, path in chart_paths.items():
+        if path.exists():
+            src = _encode_image(path)
+            title = chart_titles.get(key, key.capitalize())
+            chart_cards_html += (
+                f'<div class="chart-card">'
+                f'<img src="{src}" alt="{title}">'
+                f"</div>"
+            )
+
+    by_cat: pd.DataFrame = summary["by_category"]
+    category_rows_html = ""
+    for _, row in by_cat.iterrows():
+        category_rows_html += (
+            f"<tr>"
+            f"<td>{row['Category']}</td>"
+            f"<td>${row['Total']:,.2f}</td>"
+            f"<td>{row['Share']:.1f}%</td>"
+            f"<td>{int(row['Count'])}</td>"
+            f"</tr>"
+        )
+
+    anomalies: pd.DataFrame = summary.get("anomalies", pd.DataFrame())
+    if anomalies is not None and not anomalies.empty:
+        anomaly_html = ""
+        for _, row in anomalies.iterrows():
+            flag = "▲" if row["direction"] == "HIGH" else "▼"
+            date_str = row["Date"].strftime("%m/%d/%Y")
+            anomaly_html += (
+                f'<div class="anomaly-card">'
+                f'<span class="flag">{flag}</span>{row["explanation"]}'
+                f'<div class="meta">{date_str} &nbsp;|&nbsp; {row["Description"]}</div>'
+                f"</div>"
+            )
+        anomaly_section = anomaly_html
+    else:
+        anomaly_section = '<p class="no-anomaly">&#10003; No anomalous transactions detected.</p>'
+
+    html = _TEMPLATE.format(
+        period_start=summary["period"]["start"],
+        period_end=summary["period"]["end"],
+        generated_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        total_spent=f"{summary['total_spent']:,.2f}",
+        num_transactions=summary["num_transactions"],
+        monthly_avg=f"{summary['monthly']['average']:,.2f}",
+        num_categories=len(by_cat),
+        chart_cards=chart_cards_html,
+        category_rows=category_rows_html,
+        anomaly_section=anomaly_section,
+    )
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now().strftime(timestamp_fmt)
+    report_path = output_dir / f"expense_report_{ts}.html"
+    report_path.write_text(html, encoding="utf-8")
+
+    logger.info("HTML report saved: %s", report_path)
+    return report_path
