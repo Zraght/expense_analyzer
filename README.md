@@ -1,4 +1,4 @@
-[Versión en español](README.es.md)
+🌐 [Versión en español](README.esp.md)
 
 # expense-tracker
 
