@@ -1,3 +1,5 @@
+[Versión en español](README.es.md)
+
 # expense-tracker
 
 I originally built this because I kept exporting my bank transactions to CSV and then doing nothing with them. Opening them in Excel, scrolling around, closing the file. So at some point I just decided to write something that actually processes the data — categories, trends, anything that looks weird — and outputs something readable.

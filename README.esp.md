@@ -1,3 +1,5 @@
+[English version](README.md)
+
 # expense-tracker
 
 Lo construí originalmente porque seguía exportando mis transacciones bancarias a CSV y luego no hacía nada con ellas. Las abría en Excel, las revisaba un momento y cerraba el archivo. Así que en algún punto decidí escribir algo que procesara los datos de verdad — categorías, tendencias, todo lo que pareciera raro — y produjera algo legible.
