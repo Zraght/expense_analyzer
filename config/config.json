@@ -14,7 +14,7 @@
     "logs": "logs"
   },
   "visualization": {
-    "dpi": 150,
+    "dpi": 300,
     "figure_size_bar": [12, 6],
     "figure_size_pie": [12, 8],
     "figure_size_line": [14, 6],
