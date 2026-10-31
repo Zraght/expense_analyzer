@@ -27,8 +27,8 @@ $ expense-tracker -i data/expenses.csv
 ## Primeros pasos
 
 ```bash
-git clone https://github.com/Zraght/expense-tracker
-cd expense-tracker
+git clone https://github.com/Zraght/expense_analyzer
+cd expense_analyzer
 pip install -e .
 
 # hay un archivo de ejemplo en data/ si quieres probarlo de inmediato
