@@ -51,16 +51,17 @@ def anomaly_df() -> pd.DataFrame:
     is a clear high-z outlier that should be flagged at z_threshold=2.0.
     """
     data = {
-        "Date": pd.to_datetime([
+                "Date": pd.to_datetime([
             "2024-01-01", "2024-01-08", "2024-01-15",
             "2024-01-22", "2024-02-01", "2024-02-08",
             "2024-02-15", "2024-02-22", "2024-03-01",
+            "2024-03-08", "2024-03-15",
         ]),
-        "Category": ["Food"] * 5 + ["Transport"] * 4,
-        "Amount": [100.0, 102.0, 98.0, 101.0, 5000.0, 50.0, 52.0, 48.0, 51.0],
+        "Category": ["Food"] * 5 + ["Transport"] * 4 + ["Food"] * 2,
+        "Amount": [100.0, 102.0, 98.0, 101.0, 5000.0, 50.0, 52.0, 48.0, 51.0, 99.0, 103.0],
         "Description": [
             "Groceries", "Restaurant", "Groceries", "Coffee", "Catering",
-            "Gas", "Uber", "Bus", "Taxi",
+            "Gas", "Uber", "Bus", "Taxi", "Groceries", "Restaurant",
         ],
     }
     return pd.DataFrame(data)
